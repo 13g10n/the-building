@@ -1,0 +1,30 @@
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./data:/app/backend/data
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - open-terminal
+
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal:latest
+    volumes:
+      - open-terminal-data:/home/user
+    environment:
+      - OPEN_TERMINAL_CORS_ALLOWED_ORIGINS=*
+    restart: unless-stopped
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+
+volumes:
+  open-terminal-data:
