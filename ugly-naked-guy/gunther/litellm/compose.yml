@@ -5,7 +5,11 @@ services:
       - "4000:4000"
     env_file:
       - .env
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./callbacks:/app/callbacks
     environment:
+      PYTHONPATH: /app/callbacks
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
       LITELLM_SALT_KEY: ${LITELLM_SALT_KEY}
       DATABASE_URL: postgresql://litellm:litellm@db:5432/litellm
@@ -13,6 +17,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - ai-gateway
+    command:
+      - "--config"
+      - "/app/config.yaml"
 
   db:
     image: postgres:16
@@ -27,6 +36,12 @@ services:
       retries: 10
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ai-gateway
 
 volumes:
   postgres_data:
+
+networks:
+  ai-gateway:
+    external: true

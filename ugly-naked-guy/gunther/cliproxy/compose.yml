@@ -1,0 +1,15 @@
+services:
+  cliproxyapi:
+    image: eceasy/cli-proxy-api:latest
+    container_name: cliproxyapi
+    restart: unless-stopped
+    volumes:
+      - ./config.yaml:/CLIProxyAPI/config.yaml
+      - ./auth:/root/.cli-proxy-api
+      - ./plugins:/CLIProxyAPI/plugins
+    networks:
+      - ai-gateway
+
+networks:
+  ai-gateway:
+    external: true
