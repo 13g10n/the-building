@@ -11,10 +11,6 @@ Restart=always
 RestartSec=5
 Environment=PATH=/root/.local/bin:/usr/local/bin:/usr/bin:/bin
 
-Environment="HTTP_PROXY=http://10.0.4.4:8888"
-Environment="HTTPS_PROXY=http://10.0.4.4:8888"
-Environment="NO_PROXY=localhost,127.0.0.1,*.local,10.0.0.0/8,192.168.0.0/16,.ru,.by"
-
 # Optional: if you want logs in journal only
 StandardOutput=journal
 StandardError=journal
