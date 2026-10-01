@@ -1,7 +1,0 @@
-host: ""
-port: 8317
-debug: false
-proxy-url: "http://10.0.4.4:8888"
-request-retry: 5
-max-retry-interval: 30
-disable-cooling: true
