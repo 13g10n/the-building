@@ -1,0 +1,7 @@
+#!/bin/sh
+# Installed on the CT as both grok and agent, for the orca user.
+# /home/orca/.config/grok-proxy.env holds the proxy URL and is not committed.
+set -a
+. /home/orca/.config/grok-proxy.env
+set +a
+exec /home/orca/.grok/downloads/grok-linux-x86_64 "$@"

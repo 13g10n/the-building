@@ -5,4 +5,4 @@ The quiet, ever-present manager who sees and controls all the traffic. He runs t
 ## Services
 
 - [Headscale](headscale/README.md) runs the Tailscale control server.
-- [Gluetun](gluetun/compose.yml) is the VPN exit and HTTP proxy.
+- [Gluetun](gluetun/README.md) is the NordVPN exit. Tag sends Grok traffic through its HTTP proxy.

@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+ip=""
+for _ in $(seq 1 30); do
+  ip="$(tailscale ip -4 2>/dev/null || true)"
+  if [[ -n "$ip" ]]; then
+    break
+  fi
+  sleep 2
+done
+if [[ -z "$ip" ]]; then
+  echo "tailscale ipv4 unavailable" >&2
+  exit 1
+fi
+exec /opt/orca/squashfs-root/AppRun serve --port 6768 --pairing-address "$ip" --json

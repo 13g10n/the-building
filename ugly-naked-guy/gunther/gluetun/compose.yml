@@ -13,12 +13,18 @@ services:
       - VPN_TYPE=openvpn
       - OPENVPN_USER=${OPENVPN_USER}
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      # UDP 1194 from this network never finishes the TLS handshake.
+      - OPENVPN_PROTOCOL=tcp
       - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+      - SERVER_CATEGORIES=${SERVER_CATEGORIES}
       - HTTPPROXY=on
       - HTTPPROXY_LISTENING_ADDRESS=:8888
+      - HTTPPROXY_USER=${HTTPPROXY_USER}
+      - HTTPPROXY_PASSWORD=${HTTPPROXY_PASSWORD}
       - TZ=${TZ}
     ports:
-      - "8888:8888"
+      # LAN only. Tag reaches this proxy at 10.0.4.4:8888. Do not publish it on 0.0.0.0.
+      - "10.0.4.4:8888:8888"
     restart: unless-stopped
     volumes:
       - ./gluetun:/gluetun

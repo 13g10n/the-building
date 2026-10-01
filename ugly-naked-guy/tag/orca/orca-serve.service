@@ -1,0 +1,26 @@
+[Unit]
+Description=Orca runtime server
+After=network-online.target tailscaled.service
+Wants=network-online.target tailscaled.service
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=orca
+Group=orca
+WorkingDirectory=/home/orca
+Environment=HOME=/home/orca
+Environment=LIBGL_ALWAYS_SOFTWARE=1
+Environment=ELECTRON_DISABLE_SANDBOX=1
+Environment=PATH=/home/orca/.local/bin:/home/orca/.grok/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/usr/local/sbin/orca-serve
+StandardOutput=journal
+StandardError=journal
+KillMode=mixed
+Restart=on-failure
+RestartPreventExitStatus=3
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
