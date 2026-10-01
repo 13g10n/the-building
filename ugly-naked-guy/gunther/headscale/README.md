@@ -28,20 +28,13 @@ Clients on the same LAN as the router can fail to reach the public address when 
 | `compose.yml` | Container, ports, volume mounts |
 | `config.yaml` | Headscale settings that are not specific to this site |
 | `.env` | Hostname, server URL, ACME email, MagicDNS suffix. Not committed |
-| `.env.example` | Copy this to `.env` |
 | `data/` | SQLite database, Noise private key, Let's Encrypt account and certificates. Not committed |
 
 `.env` is ignored by the repo `.gitignore`. `data/` is ignored here because it holds the Noise key and the certificate account.
 
 ## Configure
 
-On the CT, from this directory:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` before the first start. Changing `HEADSCALE_SERVER_URL` or `HEADSCALE_DNS_BASE_DOMAIN` after nodes have joined means rejoining them.
+On the CT, create `.env` in this directory before the first start. The variables are in the table below. Changing `HEADSCALE_SERVER_URL` or `HEADSCALE_DNS_BASE_DOMAIN` after nodes have joined means rejoining them.
 
 `HEADSCALE_TLS_LETSENCRYPT_HOSTNAME` is the name in the certificate. `HEADSCALE_SERVER_URL` is that same name with `https://` and no port. Headscale refuses to start when the MagicDNS suffix is the server hostname or a parent of it, because clients would capture DNS for the control server itself.
 
@@ -50,7 +43,7 @@ Edit `.env` before the first start. Changing `HEADSCALE_SERVER_URL` or `HEADSCAL
 | `TZ` | `Europe/Minsk` | Container timezone |
 | `HEADSCALE_TLS_LETSENCRYPT_HOSTNAME` | `hs.example.com` | Certificate name |
 | `HEADSCALE_SERVER_URL` | `https://hs.example.com` | URL clients dial |
-| `HEADSCALE_ACME_EMAIL` | `you@example.com` | Let's Encrypt account contact |
+| `HEADSCALE_ACME_EMAIL` | `contact@13g10n.com` | Let's Encrypt account contact |
 | `HEADSCALE_DNS_BASE_DOMAIN` | `tailnet.internal` | MagicDNS suffix |
 
 `tailnet.internal` does not need a public DNS record. A node named `laptop` is then `laptop.tailnet.internal` inside the tailnet.
