@@ -1,0 +1,33 @@
+services:
+  headscale:
+    image: docker.io/headscale/headscale:0.29.4
+    container_name: headscale
+    restart: unless-stopped
+    read_only: true
+    command: serve
+    env_file:
+      - .env
+    environment:
+      TZ: ${TZ:?set TZ in .env}
+      HEADSCALE_SERVER_URL: ${HEADSCALE_SERVER_URL:?set HEADSCALE_SERVER_URL in .env}
+      HEADSCALE_TLS_LETSENCRYPT_HOSTNAME: ${HEADSCALE_TLS_LETSENCRYPT_HOSTNAME:?set HEADSCALE_TLS_LETSENCRYPT_HOSTNAME in .env}
+      HEADSCALE_ACME_EMAIL: ${HEADSCALE_ACME_EMAIL:?set HEADSCALE_ACME_EMAIL in .env}
+      HEADSCALE_DNS_BASE_DOMAIN: ${HEADSCALE_DNS_BASE_DOMAIN:?set HEADSCALE_DNS_BASE_DOMAIN in .env}
+    ports:
+      # Host 443 is the public HTTPS port. Headscale listens on 443 in the
+      # container so the TLS-ALPN-01 challenge and Tailscale clients match.
+      - "443:443"
+      # Metrics stay on the CT loopback. Do not forward this port.
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./config.yaml:/etc/headscale/config.yaml:ro
+      - ./data:/var/lib/headscale
+    tmpfs:
+      - /tmp
+      - /var/run/headscale
+    healthcheck:
+      test: ["CMD", "headscale", "health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
