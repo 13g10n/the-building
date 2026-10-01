@@ -1,6 +1,7 @@
 services:
   litellm:
     image: docker.litellm.ai/berriai/litellm-database:latest
+    restart: unless-stopped
     ports:
       - "4000:4000"
     env_file:
@@ -25,6 +26,7 @@ services:
 
   db:
     image: postgres:16
+    restart: unless-stopped
     environment:
       POSTGRES_USER: litellm
       POSTGRES_PASSWORD: litellm
