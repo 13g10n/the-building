@@ -1,0 +1,48 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    env_file:
+      - .env
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - OPENVPN_PROTOCOL=${OPENVPN_PROTOCOL}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+      - SERVER_CATEGORIES=${SERVER_CATEGORIES}
+      - FIREWALL_OUTBOUND_SUBNETS=100.64.0.0/10,10.0.0.0/16
+      # Exit-node clients use this resolver. Plain DNS to AdGuard leaves the
+      # tunnel toward the LAN; blocking stays on AdGuard.
+      - DNS_UPSTREAM_RESOLVER_TYPE=plain
+      - DNS_UPSTREAM_PLAIN_ADDRESSES=10.0.2.5:53
+      # Jack answers *.13g10n.dev with 10.0.2.5. Gluetun drops private
+      # answers unless the name is exempt.
+      - DNS_REBINDING_PROTECTION_EXEMPT_HOSTNAMES=*.13g10n.dev
+      - BLOCK_MALICIOUS=off
+      - TZ=${TZ}
+    restart: unless-stopped
+
+  tailscale:
+    image: tailscale/tailscale:stable
+    container_name: tailscale
+    network_mode: service:gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_AUTH_ONCE=true
+      - TS_HOSTNAME=exit
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_EXTRA_ARGS=--login-server=https://hs.13g10n.dev --advertise-exit-node --accept-dns=false
+    volumes:
+      - ./tailscale-state:/var/lib/tailscale
+    depends_on:
+      - gluetun
+    restart: unless-stopped

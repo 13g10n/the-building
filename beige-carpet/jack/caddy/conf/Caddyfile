@@ -1,0 +1,58 @@
+{
+    email {env.CADDY_TLS_EMAIL}
+}
+
+*.{env.CLOUDFLARE_ROOT_DOMAIN}, {env.CLOUDFLARE_ROOT_DOMAIN} {
+    tls {
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+        resolvers 1.1.1.1
+    }
+    
+    log {
+        output stdout
+    }
+
+    # Internal resources:
+
+    @ping host ping.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @ping {
+        respond "pong"
+    }
+
+    @proxmox host pve.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @proxmox {
+        reverse_proxy https://10.0.2.1:8006 {
+            transport http {
+                tls
+                tls_insecure_skip_verify
+            }
+        }
+    }
+
+    @pbs host pbs.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @pbs {
+        reverse_proxy https://10.0.5.3:8007 {
+            transport http {
+                tls
+                tls_insecure_skip_verify
+            }
+        }
+    }
+
+    @adguard-jack host jack.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @adguard-jack {
+        reverse_proxy 10.0.2.5:8080
+    }
+
+    @adguard-judy host judy.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @adguard-judy {
+        reverse_proxy 10.0.3.5:8080
+    }
+
+    # Public resources (via cloudflare tunnel):
+
+    @hass host h.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @hass {
+        reverse_proxy 10.0.3.10:8123
+    }
+}

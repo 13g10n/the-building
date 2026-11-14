@@ -1,0 +1,17 @@
+services:
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: ".env"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./conf:/etc/caddy
+      - ./data:/data
+      - ./config:/config
