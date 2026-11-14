@@ -49,6 +49,11 @@
         reverse_proxy 10.0.3.5:8080
     }
 
+    @paperless host paperless.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @paperless {
+        reverse_proxy 10.0.3.3:8000
+    }
+
     # Public resources (via cloudflare tunnel):
 
     @hass host h.{env.CLOUDFLARE_ROOT_DOMAIN}
