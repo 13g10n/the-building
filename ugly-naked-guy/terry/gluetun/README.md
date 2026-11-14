@@ -6,7 +6,9 @@ Gluetun owns `/dev/net/tun`, so Tailscale runs userspace (`TS_USERSPACE=true`) a
 
 With the exit node selected, the Mac sends DNS to Terry. Headscale 0.29 does not emit "use with exit node", so its global nameserver list is not used in that mode. Gluetun forwards in plaintext to AdGuard on Jack (`10.0.2.5`) and Judy (`10.0.3.5`). `*.13g10n.dev` is exempt from Gluetun's DNS rebinding protection, because Jack answers those names with `10.0.2.5` and Gluetun otherwise returns `SERVFAIL`. Gluetun's own blocklists are off. Recreate the stack after changing this. AdGuard's query log shows Terry's address, `10.0.4.3`.
 
-That covers every client that has the exit node selected, at home and away. A client with Tailscale up and no exit node still uses Headscale's global resolvers. Those are Cloudflare in `config.yaml`. Pointing them at `10.0.2.5` only works away from home if some other node, not Gunther and not this container, advertises `10.0.2.5/32` and `10.0.3.5/32`.
+That covers every client that has the exit node selected, at home and away. An exit node does not forward private ranges. `10.0.0.0/16` is also advertised as a subnet route and has to be approved, or phones send homelab addresses nowhere. iOS does this with Allow LAN access on or off, on Wi-Fi and on cellular. The Mac still reaches the lab from home because `192.168.1.1` routes there.
+
+A client with Tailscale up and no exit node uses Headscale's global resolvers for DNS. Those are Cloudflare in `config.yaml`. The approved `10.0.0.0/16` route still reaches the lab. Pointing the global resolvers at `10.0.2.5` only works away from home while that route is up.
 
 The image that registered was `tailscale/tailscale:stable` at v1.104.7. The Mac client that logged in was 1.102.4. Headscale 0.29.7 accepts clients from 1.80.0. macOS lists the exit node when Headscale is 0.29.5 or newer, because that is when it sends `suggest-exit-node`. Gunther's compose file in git still pins 0.29.4. Confirm the running server with `headscale version` on Gunther.
 
@@ -89,7 +91,7 @@ On Gunther, from `/home/admin/headscale`. `approve-routes` replaces the node's w
 
 ```bash
 docker compose exec headscale headscale nodes list-routes
-docker compose exec headscale headscale nodes approve-routes --identifier <id> --routes 0.0.0.0/0
+docker compose exec headscale headscale nodes approve-routes --identifier <id> --routes 0.0.0.0/0,10.0.0.0/16
 ```
 
 `<id>` is the live Terry node. If pages hang after the Mac selects the exit, check with `curl -4`. An approved `::/0` through this Gluetun can blackhole IPv6.
@@ -133,7 +135,7 @@ tailscale login --login-server=https://hs.13g10n.dev
 
 Quit Nord on the Mac first. Its kill switch drops Tailscale even when both apps are installed.
 
-Select the exit. `--exit-node-allow-lan-access` keeps the laptop's LAN. This stack does not advertise `10.0.0.0/8`, so lab addresses work from the laptop only while it is on that LAN.
+Select the exit. `--exit-node-allow-lan-access` keeps the laptop's own subnet. Homelab addresses use the approved `10.0.0.0/16` route through Terry.
 
 ```bash
 tailscale set --exit-node=exit --exit-node-allow-lan-access=true
