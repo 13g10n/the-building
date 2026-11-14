@@ -55,4 +55,12 @@
     handle @hass {
         reverse_proxy 10.0.3.10:8123
     }
+
+    handle {
+        root * /etc/caddy
+        rewrite * /404.html
+        file_server {
+            status 404
+        }
+    }
 }
