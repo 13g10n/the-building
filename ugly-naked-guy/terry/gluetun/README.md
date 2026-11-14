@@ -4,7 +4,7 @@ NordVPN exit for Terry, with Tailscale in the same network namespace. Forwarded 
 
 Gluetun owns `/dev/net/tun`, so Tailscale runs userspace (`TS_USERSPACE=true`) and shares Gluetun's namespace (`network_mode: service:gluetun`). Peers see the Nord address, so the usual path is a DERP relay. The first test checks the exit address. `FIREWALL_OUTBOUND_SUBNETS` lets the tailnet (`100.64.0.0/10`) and the whole homelab (`10.0.0.0/16`) out of the Nord tunnel.
 
-With the exit node selected, the Mac sends DNS to Terry. Headscale 0.29 does not emit "use with exit node", so its global nameserver list is not used in that mode. Gluetun forwards in plaintext to AdGuard on Jack (`10.0.2.5`). Judy (`10.0.3.5`) did not answer, so it is not a resolver. `*.13g10n.dev` is exempt from Gluetun's DNS rebinding protection, because Jack answers those names with `10.0.2.5` and Gluetun otherwise returns `SERVFAIL`. Gluetun's own blocklists are off. Recreate the stack after changing this. AdGuard's query log shows Terry's address, `10.0.4.3`.
+With the exit node selected, the Mac sends DNS to Terry. Headscale 0.29 does not emit "use with exit node", so its global nameserver list is not used in that mode. Gluetun forwards in plaintext to AdGuard on Jack (`10.0.2.5`) and Judy (`10.0.3.5`). `*.13g10n.dev` is exempt from Gluetun's DNS rebinding protection, because Jack answers those names with `10.0.2.5` and Gluetun otherwise returns `SERVFAIL`. Gluetun's own blocklists are off. Recreate the stack after changing this. AdGuard's query log shows Terry's address, `10.0.4.3`.
 
 That covers every client that has the exit node selected, at home and away. A client with Tailscale up and no exit node still uses Headscale's global resolvers. Those are Cloudflare in `config.yaml`. Pointing them at `10.0.2.5` only works away from home if some other node, not Gunther and not this container, advertises `10.0.2.5/32` and `10.0.3.5/32`.
 
@@ -116,7 +116,7 @@ The DNS rewrites page cannot exclude one name. Delete that wildcard there and us
 ||*.13g10n.dev^$dnsrewrite=10.0.2.5,denyallow=hs.13g10n.dev
 ```
 
-Other names such as `papers.13g10n.dev` stay on `10.0.2.5`. `hs.13g10n.dev` stays the public A record `217.21.60.143`, DNS-only in Cloudflare. Repeat the rule on Judy when Judy has the same wildcard.
+Other names such as `papers.13g10n.dev` stay on `10.0.2.5`. `hs.13g10n.dev` stays the public A record `217.21.60.143`, DNS-only in Cloudflare. Jack's sync copies this rule to Judy.
 
 ```bash
 dig +short hs.13g10n.dev @10.0.2.5

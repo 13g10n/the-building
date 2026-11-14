@@ -1,0 +1,37 @@
+# Copy Jack's AdGuard Home settings onto Judy.
+# Admin logins come from .env: ORIGIN_USERNAME, ORIGIN_PASSWORD,
+# REPLICA1_USERNAME, REPLICA1_PASSWORD.
+
+cron: "*/10 * * * *"
+runOnStart: true
+continueOnError: true
+
+origin:
+  url: http://adguard:80
+
+replicas:
+  - url: http://10.0.3.5:8080
+
+api:
+  port: 8080
+
+features:
+  generalSettings: true
+  protectionStatus: true
+  queryLogConfig: true
+  statsConfig: true
+  clientSettings: true
+  services: true
+  theme: true
+  tlsConfig: false
+  dns:
+    accessLists: true
+    serverConfig: true
+    rewrites: true
+  dhcp:
+    serverConfig: false
+    staticLeases: false
+  filters:
+    blacklist: true
+    whitelist: true
+    userRules: true
