@@ -61,6 +61,11 @@
         reverse_proxy 10.0.3.10:8123
     }
 
+    @ntfy host ntfy.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @ntfy {
+        reverse_proxy 10.0.4.5:80
+    }
+
     handle {
         root * /etc/caddy
         rewrite * /404.html
