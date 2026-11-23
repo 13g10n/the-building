@@ -27,7 +27,7 @@ services:
       - "8000:8000"
     volumes:
       - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
+      - ./media:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export
       - ./consume:/usr/src/paperless/consume
     env_file: .env
@@ -37,10 +37,6 @@ services:
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-    command: >
-      bash -c "apt-get update && 
-               apt-get install -y tesseract-ocr-rus tesseract-ocr-bel &&
-               /usr/local/bin/paperless_cmd.sh"
 
   gotenberg:
     image: docker.io/gotenberg/gotenberg:8.25
@@ -58,6 +54,5 @@ services:
 
 volumes:
   data:
-  media:
   pgdata:
   redisdata:
