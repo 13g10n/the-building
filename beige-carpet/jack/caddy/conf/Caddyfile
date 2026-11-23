@@ -54,6 +54,11 @@
         reverse_proxy 10.0.3.3:8000
     }
 
+    @fitness host fitness.{env.CLOUDFLARE_ROOT_DOMAIN}
+    handle @fitness {
+        reverse_proxy 10.0.2.7:3004
+    }
+
     # Public resources (via cloudflare tunnel):
 
     @hass host h.{env.CLOUDFLARE_ROOT_DOMAIN}
